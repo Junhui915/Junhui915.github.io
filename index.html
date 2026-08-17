@@ -1,27 +1,556 @@
 <!DOCTYPE html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>标题真的有那么好看吗</title>
-        <style>
-            *{
-                margin: 0;
-                padding: 0;
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>凤凰蛋成就展示</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f9c5d1 0%, #f0a3c2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.92);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            margin: 20px;
+        }
+        
+        .container::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 8px;
+            background: linear-gradient(90deg, #ffd700, #ff8c00, #ff1493);
+            z-index: 1;
+        }
+        
+        h1 {
+            color: #d32f2f;
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+            display: inline-block;
+            padding-bottom: 15px;
+        }
+        
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            width: 50%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #ff9800, transparent);
+            border-radius: 2px;
+        }
+        
+        .subtitle {
+            color: #ff5722;
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            font-weight: 500;
+        }
+        
+        .achievement-section {
+            background: linear-gradient(to bottom, #fff9c4, #ffecb3);
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            border: 3px dashed #ff9800;
+            position: relative;
+        }
+        
+        .achievement-section::before {
+            content: "★ 成就 ★";
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #ff5722;
+            color: white;
+            padding: 5px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+        }
+        
+        .message {
+            font-size: 1.8rem;
+            color: #d32f2f;
+            margin-bottom: 30px;
+            line-height: 1.5;
+            padding: 15px;
+            background-color: rgba(255, 255, 255, 0.7);
+            border-radius: 10px;
+            border-left: 5px solid #ff9800;
+        }
+        
+        .emoji {
+            font-size: 2.5rem;
+            display: inline-block;
+            animation: bounce 2s infinite;
+            margin: 0 10px;
+        }
+        
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+        
+        .egg-container {
+            margin: 30px 0;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            display: inline-block;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease;
+            max-width: 100%;
+            overflow: hidden;
+        }
+        
+        .egg-container:hover {
+            transform: scale(1.05);
+        }
+        
+        .egg-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            border: 5px solid #ffd700;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            display: block;
+            margin: 0 auto;
+        }
+        
+        .egg-caption {
+            margin-top: 15px;
+            font-size: 1.2rem;
+            color: #ff5722;
+            font-weight: bold;
+        }
+        
+        .navigation {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 40px;
+        }
+        
+        .nav-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #42a5f5, #1976d2);
+            color: white;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .nav-btn::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.7s;
+        }
+        
+        .nav-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .nav-btn:hover::after {
+            left: 100%;
+        }
+        
+        .nav-btn.space {
+            background: linear-gradient(135deg, #7b1fa2, #4a148c);
+        }
+        
+        .nav-btn.my {
+            background: linear-gradient(135deg, #388e3c, #1b5e20);
+        }
+        
+        .footer {
+            margin-top: 40px;
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        .counter {
+            background-color: #ffd700;
+            color: #d32f2f;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin-left: 10px;
+            font-size: 1.1rem;
+            display: inline-block;
+        }
+        
+        /* 安全警告样式 */
+        .security-notice {
+            background-color: #ffebee;
+            border: 2px solid #d32f2f;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 20px 0;
+            color: #c62828;
+            text-align: left;
+            font-size: 0.95rem;
+            display: none; /* 默认隐藏，仅在需要时显示 */
+        }
+        
+        .security-notice h3 {
+            color: #d32f2f;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .security-notice h3::before {
+            content: "⚠️";
+        }
+        
+        .error-message {
+            color: #d32f2f;
+            background-color: #ffebee;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #d32f2f;
+            display: none;
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .container {
+                padding: 30px 20px;
             }
-            body{
-                background-color: pink;
-            }
+            
             h1 {
-                color: yellow;
+                font-size: 2.2rem;
             }
-        </style>
-	</head>
-	<body>
-		<h1>我的第一个网站</h1>
-        <p>你看到这个网页就代表我已经得到超级凤凰蛋(2500)了( ﹡ˆoˆ﹡ )</p>
-        <img src="phoenix_egg.jpg" width="100" height="auto" alt="phoenix_egg.jpg">
-        <a href="/space.html">太空飞船冒险</a>
-        <a href="/my.html">关于...</a>
-	</body>
+            
+            .message {
+                font-size: 1.4rem;
+            }
+            
+            .navigation {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 80%;
+                text-align: center;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .message {
+                font-size: 1.2rem;
+            }
+            
+            .egg-container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>我的小网站</h1>
+        <p class="subtitle">记录每一个重要的游戏时刻</p>
+        
+        <!-- 安全警告区域（仅在检测到问题时显示） -->
+        <div id="securityNotice" class="security-notice">
+            <h3>安全提示</h3>
+            <p>检测到潜在的安全问题。已对内容进行安全处理，请确保您的输入是安全的。</p>
+        </div>
+        
+        <div class="achievement-section">
+            <p class="message">
+                <span class="emoji">🎉</span>
+                你看到这个网页就代表我已经得到超级凤凰蛋(2500)了
+                <span class="emoji">🎉</span>
+            </p>
+            
+            <!-- 错误消息区域 -->
+            <div id="errorMessage" class="error-message"></div>
+            
+            <div class="egg-container">
+                <p class="egg-caption">超级凤凰蛋 <span class="counter">等级: 2500</span></p>
+            </div>
+            
+            <p style="margin-top: 20px; color: #666; font-size: 1.1rem;">
+                这是一个稀有的游戏成就，只有顶尖玩家才能获得！<br>
+                凤凰蛋象征着力量、重生和不懈的努力。
+            </p>
+        </div>
+        
+        <div class="navigation">
+            <!-- 使用安全的URL编码 -->
+            <a href="/space.html" class="nav-btn space">
+                🚀 太空飞船冒险
+            </a>
+            <a href="/my.html" class="nav-btn my">
+                📖 关于我...
+            </a>
+        </div>
+        
+        <div class="footer">
+            <p>© 2023 4952小网站 | 安全优化的游戏成就分享</p>
+        </div>
+    </div>
+    
+    <script>
+        // 安全处理函数
+        function sanitizeInput(input) {
+            if (!input) return '';
+            
+            // 创建临时div元素进行文本转换
+            const div = document.createElement('div');
+            div.textContent = input;
+            
+            // 返回纯文本内容，避免HTML注入
+            return div.textContent;
+        }
+        
+        // 安全地设置图片源
+        function setImageSourceSafely(imgElement, src) {
+            try {
+                // 验证URL是否安全
+                const url = new URL(src, window.location.origin);
+                
+                // 只允许同源或特定的安全域名
+                const allowedDomains = [
+                    window.location.hostname,
+                    'localhost',
+                    '127.0.0.1'
+                ];
+                
+                if (!allowedDomains.includes(url.hostname) && !url.hostname.endsWith('.github.io')) {
+                    throw new Error('不安全的图片源');
+                }
+                
+                // 设置图片源
+                imgElement.src = src;
+                
+                // 移除错误消息
+                document.getElementById('errorMessage').style.display = 'none';
+            } catch (error) {
+                console.error('图片加载错误:', error);
+                showFallbackImage(imgElement);
+                showErrorMessage('图片加载失败，已使用安全替代方案。');
+            }
+        }
+        
+        // 显示后备图片
+        function showFallbackImage(imgElement) {
+            // 隐藏原图片
+            imgElement.style.display = 'none';
+            
+            // 创建SVG后备
+            const container = imgElement.parentElement;
+            const existingFallback = container.querySelector('.fallback-image');
+            if (existingFallback) return;
+            
+            const svgFallback = document.createElement('div');
+            svgFallback.className = 'fallback-image';
+            svgFallback.innerHTML = `
+                <div style="width: 100%; max-width: 400px; height: 300px; background: linear-gradient(135deg, #ffd54f, #ffb300); border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; position: relative; margin: 0 auto; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 5px solid #ff9800; display: flex; align-items: center; justify-content: center;">
+                    <div style="text-align: center; color: #d32f2f; font-weight: bold; font-size: 1.5rem;">
+                        🥚 超级凤凰蛋 🥚<br>
+                        <span style="font-size: 1rem;">等级: 2500</span>
+                    </div>
+                </div>
+            `;
+            
+            container.appendChild(svgFallback);
+        }
+        
+        // 显示错误消息
+        function showErrorMessage(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = sanitizeInput(message);
+            errorDiv.style.display = 'block';
+        }
+        
+        // 检查URL参数中的安全问题
+        function checkURLSecurity() {
+            const urlParams = new URLSearchParams(window.location.search);
+            let hasSecurityIssue = false;
+            
+            // 检查是否有可疑参数
+            for (const [key, value] of urlParams) {
+                // 检查是否有脚本注入尝试
+                const suspiciousPatterns = [
+                    /<script/i,
+                    /javascript:/i,
+                    /onerror=/i,
+                    /onload=/i,
+                    /onclick=/i,
+                    /'">/
+                ];
+                
+                for (const pattern of suspiciousPatterns) {
+                    if (pattern.test(value)) {
+                        hasSecurityIssue = true;
+                        console.warn('检测到可疑URL参数:', key, value);
+                        break;
+                    }
+                }
+                
+                if (hasSecurityIssue) break;
+            }
+            
+            // 如果有安全问题，显示警告
+            if (hasSecurityIssue) {
+                document.getElementById('securityNotice').style.display = 'block';
+                
+                // 记录安全事件（在实际应用中，这里可以发送到服务器）
+                console.log('安全事件: 检测到可疑URL参数');
+            }
+        }
+        
+        // 页面加载完成后的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查URL安全
+            checkURLSecurity();
+            
+            // 安全地设置图片源
+            const eggImage = document.getElementById('phoenixEggImage');
+            
+            // 检查图片是否正常加载
+            eggImage.addEventListener('error', function() {
+                showFallbackImage(this);
+                showErrorMessage('凤凰蛋图片加载失败，已使用安全替代方案。');
+            });
+            
+            // 尝试加载图片
+            eggImage.addEventListener('load', function() {
+                document.getElementById('errorMessage').style.display = 'none';
+            });
+            
+            // 为成就区域添加安全的点击效果
+            const achievementSection = document.querySelector('.achievement-section');
+            achievementSection.addEventListener('click', function() {
+                this.style.transform = 'scale(0.99)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 200);
+                
+                // 创建安全的庆祝效果
+                createSafeCelebration();
+            });
+            
+            // 创建安全的庆祝效果
+            function createSafeCelebration() {
+                const emojis = ['✨', '🌟', '🎊', '🥳', '🎉', '⭐'];
+                const container = document.querySelector('.container');
+                
+                for (let i = 0; i < 12; i++) {
+                    const emoji = document.createElement('div');
+                    // 使用textContent而不是innerHTML来设置表情符号
+                    emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+                    emoji.style.position = 'absolute';
+                    emoji.style.fontSize = Math.random() * 20 + 20 + 'px';
+                    emoji.style.left = Math.random() * 100 + '%';
+                    emoji.style.top = Math.random() * 100 + '%';
+                    emoji.style.opacity = '0.9';
+                    emoji.style.zIndex = '1000';
+                    emoji.style.pointerEvents = 'none';
+                    emoji.style.animation = `floatUp ${Math.random() * 1 + 1}s forwards`;
+                    
+                    container.appendChild(emoji);
+                    
+                    // 移除元素
+                    setTimeout(() => {
+                        if (emoji.parentNode) {
+                            emoji.remove();
+                        }
+                    }, 1500);
+                }
+                
+                // 添加CSS动画
+                if (!document.querySelector('#celebrate-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'celebrate-style';
+                    // 使用textContent而不是innerHTML
+                    style.textContent = `
+                        @keyframes floatUp {
+                            0% { transform: translateY(0) rotate(0deg); opacity: 0.9; }
+                            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }
+            
+            // 安全地处理所有用户生成的内容
+            const userContentElements = document.querySelectorAll('[data-user-content]');
+            userContentElements.forEach(element => {
+                const originalContent = element.getAttribute('data-user-content');
+                if (originalContent) {
+                    element.textContent = sanitizeInput(originalContent);
+                }
+            });
+        });
+        
+        // 防止右键菜单和F12（简单防护，实际中应该服务器端验证）
+        document.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+        
+        // 防止F12（仅基础防护）
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
+                e.preventDefault();
+                alert('为了安全考虑，开发者工具已被禁用。');
+            }
+        });
+    </script>
+</body>
 </html>
