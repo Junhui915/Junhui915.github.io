@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>翻转国际象棋 · 兵升变支持</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        body {
+            background: linear-gradient(145deg, #1e3c2c, #2a5a3a);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+        }
+        .container {
+            background: #d6b17e;
+            padding: 2rem 2rem 1.8rem;
+            border-radius: 48px;
+            box-shadow: 0 25px 40px rgba(0, 0, 0, 0.7), inset 0 0 0 1px #efd9b0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+        .board-wrapper {
+            position: relative;
+            background: #b58863;
+            padding: 18px;
+            border-radius: 28px;
+            box-shadow: inset 0 -6px 0 #7a5c3e, 0 12px 28px rgba(0,0,0,0.5);
+        }
+        canvas {
+            display: block;
+            width: 560px;
+            height: 560px;
+            border-radius: 16px;
+            box-shadow: 0 0 0 2px #c8a27b, 0 0 0 6px #6f4f2e;
+            background: #f0d9b5;
+            cursor: pointer;
+            touch-action: none;
+        }
+        .status-bar {
+            margin-top: 22px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #f7f0e0;
+            font-weight: 600;
+            font-size: 1.3rem;
+            text-shadow: 0 2px 3px rgba(0,0,0,0.5);
+            background: #3f2e1b;
+            padding: 10px 22px;
+            border-radius: 60px;
+            box-shadow: inset 0 2px 5px #1f140a, 0 6px 12px rgba(0,0,0,0.3);
+            letter-spacing: 0.5px;
+        }
+        .turn-indicator {
+            background: #b78a5c;
+            padding: 6px 24px;
+            border-radius: 40px;
+            color: #1e1a14;
+            box-shadow: inset 0 -3px 0 #5d3f24;
+            font-size: 1.2rem;
+        }
+        .btn-group {
+            display: flex;
+            gap: 16px;
+        }
+        .btn {
+            background: #5d432b;
+            border: none;
+            color: #efe3cf;
+            font-size: 1.1rem;
+            font-weight: bold;
+            padding: 6px 22px;
+            border-radius: 40px;
+            box-shadow: 0 5px 0 #2f1f11, 0 3px 10px rgba(0,0,0,0.4);
+            cursor: pointer;
+            transition: all 0.07s ease;
+            letter-spacing: 0.5px;
+        }
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #2f1f11;
+        }
+        .btn.reset {
+            background: #7e4f3a;
+        }
+        .btn:hover {
+            filter: brightness(1.1);
+        }
+        /* 兵升变弹窗 */
+        .promotion-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            border-radius: 48px;
+            z-index: 10;
+            backdrop-filter: blur(3px);
+        }
+        .promotion-overlay.active {
+            display: flex;
+        }
+        .promotion-dialog {
+            background: #e8d5b5;
+            padding: 30px 40px 40px;
+            border-radius: 60px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.7);
+            text-align: center;
+            border: 4px solid #b78a5c;
+        }
+        .promotion-dialog h3 {
+            margin: 0 0 18px 0;
+            color: #2d1f10;
+            font-size: 1.6rem;
+            letter-spacing: 1px;
+        }
+        .promotion-options {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+        .promotion-btn {
+            width: 80px;
+            height: 80px;
+            font-size: 3.2rem;
+            background: #f7efe0;
+            border: 4px solid #7a5c3e;
+            border-radius: 24px;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            box-shadow: 0 6px 0 #4d351e;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1a1a1a;
+        }
+        .promotion-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 #4d351e;
+        }
+        .promotion-btn:hover {
+            background: #ffffff;
+            border-color: #a77b4f;
+        }
+        @media (max-width: 640px) {
+            .container { padding: 1rem; }
+            canvas { width: 88vw; height: 88vw; max-width: 560px; max-height: 560px; }
+            .status-bar { flex-wrap: wrap; gap: 12px; justify-content: center; }
+            .promotion-btn { width: 60px; height: 60px; font-size: 2.4rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="board-wrapper">
+            <canvas id="chessCanvas" width="560" height="560"></canvas>
+        </div>
+        <div class="status-bar">
+            <span class="turn-indicator" id="turnDisplay">♚ 黑方走</span>
+            <div class="btn-group">
+                <button class="btn reset" id="resetBtn">↺ 重置</button>
+            </div>
+        </div>
+        <!-- 兵升变弹窗 -->
+        <div class="promotion-overlay" id="promotionOverlay">
+            <div class="promotion-dialog">
+                <h3>♛ 兵升变</h3>
+                <div class="promotion-options" id="promotionOptions">
+                    <!-- 动态生成 -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        (function(){
+            const canvas = document.getElementById('chessCanvas');
+            const ctx = canvas.getContext('2d');
+            const turnDisplay = document.getElementById('turnDisplay');
+            const promotionOverlay = document.getElementById('promotionOverlay');
+            const promotionOptions = document.getElementById('promotionOptions');
+
+            const BOARD_SIZE = 8;
+            let board = [];
+            let currentTurn = 'black';
+            let selectedSquare = null;
+            let validMoves = [];
+            // 升变暂存
+            let pendingPromotion = null; // { row, col, color }
+
+            function getBoardFlipped() {
+                return currentTurn === 'black';
+            }
+
+            const PIECE_SYMBOLS = {
+                'K': '♔', 'Q': '♕', 'R': '♖', 'B': '♗', 'N': '♘', 'P': '♙',
+                'k': '♚', 'q': '♛', 'r': '♜', 'b': '♝', 'n': '♞', 'p': '♟'
+            };
+            // 升变可选棋子 (按顺序)
+            const PROMOTION_PIECES = ['Q', 'R', 'B', 'N'];
+
+            function initBoard() {
+                const newBoard = Array(BOARD_SIZE).fill().map(() => Array(BOARD_SIZE).fill(null));
+                const backRank = ['R','N','B','Q','K','B','N','R'];
+                for (let c = 0; c < 8; c++) {
+                    newBoard[0][c] = { piece: backRank[c], color: 'black' };
+                    newBoard[1][c] = { piece: 'P', color: 'black' };
+                    newBoard[6][c] = { piece: 'P', color: 'white' };
+                    newBoard[7][c] = { piece: backRank[c], color: 'white' };
+                }
+                return newBoard;
+            }
+
+            function resetGame() {
+                board = initBoard();
+                currentTurn = 'black';
+                selectedSquare = null;
+                validMoves = [];
+                pendingPromotion = null;
+                promotionOverlay.classList.remove('active');
+                updateTurnDisplay();
+                drawBoard();
+            }
+
+            // ---------- 绘制 (同前) ----------
+            function drawBoard() {
+                const size = 560;
+                const squareSize = size / BOARD_SIZE;
+                const flipped = getBoardFlipped();
+
+                const lightColor = '#f0d9b5';
+                const darkColor = '#b58863';
+                const selectedColor = '#7fc97f';
+                const validColor = 'rgba(0, 180, 60, 0.45)';
+
+                for (let i = 0; i < BOARD_SIZE; i++) {
+                    for (let j = 0; j < BOARD_SIZE; j++) {
+                        let row = flipped ? (BOARD_SIZE - 1 - i) : i;
+                        let col = flipped ? (BOARD_SIZE - 1 - j) : j;
+
+                        const x = j * squareSize;
+                        const y = i * squareSize;
+                        const isLight = (row + col) % 2 === 0;
+                        ctx.fillStyle = isLight ? lightColor : darkColor;
+
+                        if (selectedSquare && selectedSquare.row === row && selectedSquare.col === col) {
+                            ctx.fillStyle = selectedColor;
+                        }
+                        ctx.fillRect(x, y, squareSize, squareSize);
+
+                        const isValid = validMoves.some(m => m.row === row && m.col === col);
+                        if (isValid) {
+                            ctx.beginPath();
+                            ctx.arc(x + squareSize/2, y + squareSize/2, squareSize*0.2, 0, 2 * Math.PI);
+                            ctx.fillStyle = validColor;
+                            ctx.fill();
+                            ctx.strokeStyle = 'rgba(255,255,200,0.3)';
+                            ctx.lineWidth = 2;
+                            ctx.stroke();
+                        }
+
+                        const cell = board[row][col];
+                        if (cell) {
+                            const symbolKey = cell.color === 'white' ? cell.piece : cell.piece.toLowerCase();
+                            const symbol = PIECE_SYMBOLS[symbolKey] || cell.piece;
+                            ctx.font = `${squareSize * 0.8}px 'Segoe UI', 'Arial Unicode MS', sans-serif`;
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+                            ctx.shadowBlur = 8;
+                            ctx.shadowOffsetY = 2;
+                            ctx.fillStyle = cell.color === 'white' ? '#ffffff' : '#1a1a1a';
+                            ctx.fillText(symbol, x + squareSize/2, y + squareSize/2 + 2);
+                            ctx.shadowBlur = 0;
+                            ctx.strokeStyle = cell.color === 'white' ? '#888' : '#555';
+                            ctx.lineWidth = 1.5;
+                            ctx.strokeText(symbol, x + squareSize/2, y + squareSize/2 + 2);
+                            ctx.shadowBlur = 0;
+                        }
+                    }
+                }
+
+                ctx.font = 'bold 14px "Segoe UI"';
+                ctx.fillStyle = '#3d2a17';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                const files = 'abcdefgh';
+                const ranks = '12345678';
+                for (let i = 0; i < 8; i++) {
+                    const idx = flipped ? (7 - i) : i;
+                    const fileX = i * squareSize + squareSize/2;
+                    const fileY = 8 * squareSize - 20;
+                    ctx.fillText(files[idx], fileX, fileY);
+                    const rankY = i * squareSize + squareSize/2 + 6;
+                    const rankX = 12;
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(ranks[idx], rankX, rankY);
+                    ctx.textAlign = 'center';
+                }
+            }
+
+            // ---------- 走法生成 ----------
+            function generateMoves(row, col) {
+                const cell = board[row][col];
+                if (!cell) return [];
+                const { piece, color } = cell;
+                const enemy = color === 'white' ? 'black' : 'white';
+                const moves = [];
+                const inBounds = (r, c) => r >= 0 && r < 8 && c >= 0 && c < 8;
+                const addMove = (r, c) => {
+                    if (!inBounds(r, c)) return false;
+                    const target = board[r][c];
+                    if (target && target.color === color) return false;
+                    moves.push({ row: r, col: c });
+                    if (target && target.color === enemy) return false;
+                    return true;
+                };
+
+                switch (piece) {
+                    case 'P': {
+                        const dir = color === 'white' ? -1 : 1;
+                        const startRow = color === 'white' ? 6 : 1;
+                        const nr = row + dir;
+                        if (inBounds(nr, col) && !board[nr][col]) {
+                            moves.push({ row: nr, col });
+                            if (row === startRow) {
+                                const nr2 = row + 2*dir;
+                                if (!board[nr2][col]) moves.push({ row: nr2, col });
+                            }
+                        }
+                        for (const dc of [-1, 1]) {
+                            const nc = col + dc;
+                            if (inBounds(nr, nc) && board[nr][nc] && board[nr][nc].color === enemy) {
+                                moves.push({ row: nr, col: nc });
+                            }
+                        }
+                        break;
+                    }
+                    case 'N': {
+                        const knightOffsets = [[-2,-1],[-2,1],[-1,-2],[-1,2],[1,-2],[1,2],[2,-1],[2,1]];
+                        for (const [dr, dc] of knightOffsets) {
+                            const nr = row + dr, nc = col + dc;
+                            if (inBounds(nr, nc)) {
+                                const target = board[nr][nc];
+                                if (!target || target.color === enemy) moves.push({ row: nr, col: nc });
+                            }
+                        }
+                        break;
+                    }
+                    case 'B': {
+                        for (const [dr, dc] of [[-1,-1],[-1,1],[1,-1],[1,1]]) {
+                            for (let i = 1; i < 8; i++) {
+                                const nr = row + dr*i, nc = col + dc*i;
+                                if (!addMove(nr, nc)) break;
+                            }
+                        }
+                        break;
+                    }
+                    case 'R': {
+                        for (const [dr, dc] of [[-1,0],[1,0],[0,-1],[0,1]]) {
+                            for (let i = 1; i < 8; i++) {
+                                const nr = row + dr*i, nc = col + dc*i;
+                                if (!addMove(nr, nc)) break;
+                            }
+                        }
+                        break;
+                    }
+                    case 'Q': {
+                        for (const [dr, dc] of [[-1,-1],[-1,1],[1,-1],[1,1],[-1,0],[1,0],[0,-1],[0,1]]) {
+                            for (let i = 1; i < 8; i++) {
+                                const nr = row + dr*i, nc = col + dc*i;
+                                if (!addMove(nr, nc)) break;
+                            }
+                        }
+                        break;
+                    }
+                    case 'K': {
+                        for (const [dr, dc] of [[-1,-1],[-1,0],[-1,1],[0,-1],[0,1],[1,-1],[1,0],[1,1]]) {
+                            const nr = row + dr, nc = col + dc;
+                            if (inBounds(nr, nc)) {
+                                const target = board[nr][nc];
+                                if (!target || target.color === enemy) moves.push({ row: nr, col: nc });
+                            }
+                        }
+                        break;
+                    }
+                }
+                return moves;
+            }
+
+            function filterLegalMoves(row, col, moves) {
+                const color = board[row][col].color;
+                const enemy = color === 'white' ? 'black' : 'white';
+                const legal = [];
+                for (const m of moves) {
+                    const captured = board[m.row][m.col];
+                    board[m.row][m.col] = board[row][col];
+                    board[row][col] = null;
+
+                    let kingPos = null;
+                    for (let r = 0; r < 8; r++) {
+                        for (let c = 0; c < 8; c++) {
+                            const cell = board[r][c];
+                            if (cell && cell.piece === 'K' && cell.color === color) {
+                                kingPos = { row: r, col: c };
+                            }
+                        }
+                    }
+                    let inCheck = false;
+                    if (kingPos) {
+                        for (let r = 0; r < 8; r++) {
+                            for (let c = 0; c < 8; c++) {
+                                const cell = board[r][c];
+                                if (cell && cell.color === enemy) {
+                                    const enemyMoves = generateMoves(r, c);
+                                    if (enemyMoves.some(mm => mm.row === kingPos.row && mm.col === kingPos.col)) {
+                                        inCheck = true;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (inCheck) break;
+                        }
+                    }
+
+                    board[row][col] = board[m.row][m.col];
+                    board[m.row][m.col] = captured;
+
+                    if (!inCheck) legal.push(m);
+                }
+                return legal;
+            }
+
+            function getLegalMovesFor(row, col) {
+                const cell = board[row][col];
+                if (!cell) return [];
+                const raw = generateMoves(row, col);
+                return filterLegalMoves(row, col, raw);
+            }
+
+            // ---------- 升变处理 ----------
+            function showPromotionDialog(row, col, color) {
+                pendingPromotion = { row, col, color };
+                // 生成按钮 (使用棋子符号)
+                promotionOptions.innerHTML = '';
+                PROMOTION_PIECES.forEach(piece => {
+                    const btn = document.createElement('button');
+                    btn.className = 'promotion-btn';
+                    const symbolKey = color === 'white' ? piece : piece.toLowerCase();
+                    btn.textContent = PIECE_SYMBOLS[symbolKey];
+                    btn.dataset.piece = piece;
+                    btn.addEventListener('click', () => {
+                        applyPromotion(piece);
+                    });
+                    promotionOptions.appendChild(btn);
+                });
+                promotionOverlay.classList.add('active');
+            }
+
+            function applyPromotion(piece) {
+                if (!pendingPromotion) return;
+                const { row, col, color } = pendingPromotion;
+                board[row][col] = { piece, color };
+                pendingPromotion = null;
+                promotionOverlay.classList.remove('active');
+
+                // 升变完成，切换回合
+                currentTurn = currentTurn === 'white' ? 'black' : 'white';
+                selectedSquare = null;
+                validMoves = [];
+                updateTurnDisplay();
+                drawBoard();
+            }
+
+            // ---------- 走子逻辑 (加入升变检测) ----------
+            function executeMove(fromRow, fromCol, toRow, toCol) {
+                const piece = board[fromRow][fromCol];
+                board[toRow][toCol] = piece;
+                board[fromRow][fromCol] = null;
+
+                // 检测兵升变: 兵到达对方底线
+                if (piece.piece === 'P') {
+                    const promotionRow = piece.color === 'white' ? 0 : 7;
+                    if (toRow === promotionRow) {
+                        // 弹出升变选择，暂不切换回合
+                        showPromotionDialog(toRow, toCol, piece.color);
+                        return; // 升变完成后再切换回合
+                    }
+                }
+
+                // 无升变，正常切换回合
+                currentTurn = currentTurn === 'white' ? 'black' : 'white';
+                selectedSquare = null;
+                validMoves = [];
+                updateTurnDisplay();
+                drawBoard();
+            }
+
+            // ---------- 点击处理 ----------
+            function handleSquareClick(row, col) {
+                // 如果升变弹窗打开，忽略棋盘点击
+                if (promotionOverlay.classList.contains('active')) return;
+
+                if (selectedSquare) {
+                    const isTarget = validMoves.some(m => m.row === row && m.col === col);
+                    if (isTarget) {
+                        executeMove(selectedSquare.row, selectedSquare.col, row, col);
+                        return;
+                    }
+                }
+
+                const cell = board[row][col];
+                if (cell && cell.color === currentTurn) {
+                    const moves = getLegalMovesFor(row, col);
+                    if (moves.length > 0) {
+                        selectedSquare = { row, col };
+                        validMoves = moves;
+                    } else {
+                        selectedSquare = null;
+                        validMoves = [];
+                    }
+                    drawBoard();
+                } else {
+                    selectedSquare = null;
+                    validMoves = [];
+                    drawBoard();
+                }
+            }
+
+            // ---------- 事件绑定 ----------
+            function getSquareFromEvent(e) {
+                const rect = canvas.getBoundingClientRect();
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+                let clientX, clientY;
+                if (e.touches) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                    e.preventDefault();
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+                const canvasX = (clientX - rect.left) * scaleX;
+                const canvasY = (clientY - rect.top) * scaleY;
+                if (canvasX < 0 || canvasX >= canvas.width || canvasY < 0 || canvasY >= canvas.height) {
+                    return null;
+                }
+                const col = Math.floor(canvasX / (canvas.width / BOARD_SIZE));
+                const row = Math.floor(canvasY / (canvas.height / BOARD_SIZE));
+                const flipped = getBoardFlipped();
+                const actualRow = flipped ? (BOARD_SIZE - 1 - row) : row;
+                const actualCol = flipped ? (BOARD_SIZE - 1 - col) : col;
+                return { row: actualRow, col: actualCol };
+            }
+
+            function onCanvasClick(e) {
+                const sq = getSquareFromEvent(e);
+                if (sq) {
+                    handleSquareClick(sq.row, sq.col);
+                }
+                e.preventDefault();
+            }
+
+            function onTouchStart(e) {
+                const sq = getSquareFromEvent(e);
+                if (sq) {
+                    handleSquareClick(sq.row, sq.col);
+                }
+                e.preventDefault();
+            }
+
+            function updateTurnDisplay() {
+                const turnName = currentTurn === 'white' ? '白方' : '黑方';
+                const symbol = currentTurn === 'white' ? '♔' : '♚';
+                turnDisplay.textContent = `${symbol} ${turnName}走`;
+            }
+
+            // ---------- 初始化 ----------
+            function init() {
+                resetGame();
+                canvas.addEventListener('click', onCanvasClick);
+                canvas.addEventListener('touchstart', onTouchStart, { passive: false });
+                document.getElementById('resetBtn').addEventListener('click', resetGame);
+            }
+
+            init();
+        })();
+    </script>
+</body>
+</html>
