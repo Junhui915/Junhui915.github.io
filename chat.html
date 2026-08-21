@@ -2,910 +2,765 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
-    <title>全模型通用 · 多会话助手</title>
-    <!-- Font Awesome 6 (免费) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AI 聊天 · 菜单配置</title>
     <style>
         * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
         }
 
         body {
-            background: #f4f7fc;
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f7f9fc;
             height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 12px;
+            padding: 16px;
         }
 
-        .app-container {
+        /* 主卡片 */
+        .chat-app {
+            max-width: 800px;
             width: 100%;
-            max-width: 1400px;
-            height: 100%;
-            max-height: 900px;
+            height: 95vh;
+            max-height: 820px;
             background: white;
-            border-radius: 28px;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             display: flex;
             flex-direction: column;
             overflow: hidden;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
         }
 
-        /* 头部 */
-        .app-header {
-            padding: 16px 24px;
+        /* 顶部菜单栏 */
+        .menu-bar {
             background: #ffffff;
-            border-bottom: 1px solid #e9edf4;
+            padding: 16px 20px;
+            border-bottom: 1px solid #eef2f6;
             display: flex;
-            flex-wrap: wrap;
-            align-items: center;
             justify-content: space-between;
-            gap: 12px;
+            align-items: center;
             flex-shrink: 0;
+            flex-wrap: wrap;
+            gap: 8px 12px;
         }
 
-        .logo-area {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .logo-area i {
-            font-size: 26px;
-            color: #4a6cf7;
-            background: #eef2ff;
-            padding: 10px;
-            border-radius: 14px;
-        }
-
-        .logo-area h1 {
-            font-size: 1.4rem;
+        .menu-bar h1 {
+            font-size: 1.2rem;
             font-weight: 600;
-            color: #1e293b;
-            letter-spacing: -0.3px;
-        }
-
-        .header-actions {
+            color: #0b1a33;
+            letter-spacing: -0.01em;
             display: flex;
             align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
+            gap: 6px;
         }
 
-        .config-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
+        .menu-bar h1 span {
+            background: #eef3fc;
+            color: #1f5f9e;
+            font-size: 0.65rem;
+            font-weight: 500;
+            padding: 2px 10px;
+            border-radius: 20px;
+            margin-left: 4px;
         }
 
-        .config-field {
-            display: flex;
-            align-items: center;
-            background: #f1f5f9;
-            border-radius: 40px;
-            padding: 4px 6px 4px 16px;
-            border: 1px solid #e2e8f0;
-            transition: 0.2s;
-        }
-        .config-field:focus-within {
-            border-color: #4a6cf7;
-            box-shadow: 0 0 0 3px rgba(74,108,247,0.15);
-        }
-        .config-field input {
+        .menu-toggle-btn {
+            background: #f0f4fa;
             border: none;
-            background: transparent;
-            padding: 8px 6px;
-            font-size: 0.85rem;
-            width: 150px;
-            outline: none;
-            color: #1e293b;
-        }
-        .config-field input::placeholder {
-            color: #94a3b8;
-            font-size: 0.75rem;
-        }
-        .config-field i {
-            color: #64748b;
-            font-size: 0.8rem;
-            margin-right: 4px;
-        }
-        .config-field button {
-            background: transparent;
-            border: none;
-            color: #64748b;
-            padding: 6px 10px;
             border-radius: 30px;
-            cursor: pointer;
+            padding: 8px 18px;
             font-size: 0.9rem;
+            font-weight: 500;
+            color: #1a2c4e;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
             transition: 0.15s;
-        }
-        .config-field button:hover {
-            background: #e2e8f0;
-            color: #0f172a;
-        }
-        .save-status {
-            font-size: 0.7rem;
-            color: #16a34a;
-            min-width: 40px;
-            margin-left: 2px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
         }
 
-        .btn-primary {
-            background: #4a6cf7;
+        .menu-toggle-btn:hover {
+            background: #e4ebf5;
+        }
+
+        .menu-toggle-btn svg {
+            width: 18px;
+            height: 18px;
+            stroke: currentColor;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        /* 配置面板 (侧滑菜单) */
+        .config-panel {
+            background: #fafcff;
+            border-bottom: 1px solid #e2e8f0;
+            padding: 20px 20px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            flex-shrink: 0;
+            transition: all 0.25s cubic-bezier(0.2, 0, 0, 1);
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transform: translateY(-8px);
+            pointer-events: none;
+        }
+
+        .config-panel.open {
+            max-height: 380px;
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            padding: 20px 20px 18px;
+            border-bottom: 1px solid #dce3ec;
+        }
+
+        .config-row {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .config-row label {
+            font-size: 0.8rem;
+            font-weight: 500;
+            color: #2b405e;
+            letter-spacing: 0.01em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .config-row label small {
+            font-weight: 400;
+            color: #6a7e9e;
+            font-size: 0.7rem;
+        }
+
+        .config-row input {
+            background: white;
+            border: 1px solid #d0d9e6;
+            border-radius: 14px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            color: #0b1a33;
+            transition: 0.2s;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .config-row input:focus {
+            border-color: #2d7aff;
+            box-shadow: 0 0 0 3px rgba(45, 122, 255, 0.15);
+        }
+
+        .config-row input::placeholder {
+            color: #a3b6d0;
+            font-weight: 400;
+        }
+
+        .config-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 4px;
+        }
+
+        .config-actions button {
+            background: transparent;
             border: none;
-            color: white;
             padding: 8px 18px;
             border-radius: 40px;
             font-weight: 500;
             font-size: 0.9rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
             cursor: pointer;
             transition: 0.15s;
-            border: 1px solid #4a6cf7;
-            white-space: nowrap;
+            background: #eaf0f8;
+            color: #1f3a5f;
         }
-        .btn-primary:hover {
-            background: #3b5de7;
+
+        .config-actions .save-btn {
+            background: #1a5cff;
+            color: white;
+            box-shadow: 0 4px 8px -2px rgba(26, 92, 255, 0.25);
+        }
+
+        .config-actions .save-btn:hover {
+            background: #0f4ad6;
             transform: scale(0.97);
         }
-        .btn-outline {
-            background: transparent;
-            border: 1px solid #d1d9e6;
-            color: #334155;
-            padding: 8px 16px;
-            border-radius: 40px;
-            font-weight: 500;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: 0.15s;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            white-space: nowrap;
-        }
-        .btn-outline:hover {
-            background: #f1f5f9;
-            border-color: #94a3b8;
-        }
-        .btn-danger-outline {
-            background: transparent;
-            border: 1px solid #fecaca;
-            color: #b91c1c;
-            padding: 6px 12px;
-            border-radius: 40px;
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: 0.15s;
-        }
-        .btn-danger-outline:hover {
-            background: #fee2e2;
+
+        .config-actions button:not(.save-btn):hover {
+            background: #dce5f0;
         }
 
-        /* 主体 */
-        .main-layout {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
-
-        /* 左侧会话列表 */
-        .session-sidebar {
-            width: 260px;
-            background: #f8fafc;
-            border-right: 1px solid #e9edf4;
-            display: flex;
-            flex-direction: column;
-            flex-shrink: 0;
-            transition: width 0.2s;
-            overflow: hidden;
-        }
-
-        .session-sidebar-header {
-            padding: 16px 16px 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #e9edf4;
-        }
-        .session-sidebar-header h3 {
-            font-size: 0.9rem;
-            font-weight: 600;
-            color: #475569;
-            letter-spacing: 0.3px;
-        }
-        .session-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px 10px 20px;
-            list-style: none;
-        }
-        .session-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 14px;
-            margin-bottom: 4px;
-            border-radius: 14px;
-            cursor: pointer;
-            transition: 0.15s;
-            background: transparent;
-            border: 1px solid transparent;
-        }
-        .session-item:hover {
-            background: #eef2ff;
-            border-color: #d9e2f0;
-        }
-        .session-item.active {
-            background: #ffffff;
-            border-color: #4a6cf7;
-            box-shadow: 0 2px 8px rgba(74,108,247,0.08);
-        }
-        .session-item .session-name {
-            flex: 1;
-            font-size: 0.9rem;
-            color: #1e293b;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-weight: 500;
-            margin-right: 8px;
-        }
-        .session-item .session-actions {
-            display: flex;
-            gap: 4px;
-            flex-shrink: 0;
-        }
-        .session-item .session-actions button {
-            background: transparent;
-            border: none;
-            color: #94a3b8;
-            cursor: pointer;
-            padding: 4px 6px;
-            border-radius: 8px;
-            font-size: 0.75rem;
-            transition: 0.1s;
-        }
-        .session-item .session-actions button:hover {
-            background: #e2e8f0;
-            color: #0f172a;
-        }
-        .session-item .session-actions .del-btn:hover {
-            color: #b91c1c;
-            background: #fee2e2;
-        }
-        .add-session-btn {
-            margin: 8px 16px 16px;
-            width: calc(100% - 32px);
-            background: #eef2ff;
-            border: 1px dashed #4a6cf7;
-            color: #4a6cf7;
-            padding: 10px 0;
-            border-radius: 40px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.15s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        .add-session-btn:hover {
-            background: #d9e2ff;
-        }
-
-        /* 聊天区 */
-        .chat-area {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            background: #ffffff;
-            min-width: 0;
-        }
-
-        .chat-header {
-            padding: 14px 24px;
-            border-bottom: 1px solid #e9edf4;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #fafcff;
-            flex-shrink: 0;
-        }
-        .chat-header .session-title {
-            font-weight: 600;
-            color: #0f172a;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .chat-header .session-title i {
-            color: #4a6cf7;
-        }
+        /* 聊天消息容器 */
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 20px 24px;
+            padding: 20px 20px 8px;
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            background: #fafcff;
+            gap: 12px;
+            background: #fbfdff;
+            scroll-behavior: smooth;
         }
 
-        .message {
-            max-width: 80%;
-            padding: 14px 20px;
-            border-radius: 24px;
-            line-height: 1.6;
+        .chat-messages .message {
+            max-width: 82%;
+            padding: 14px 18px;
+            border-radius: 22px;
+            line-height: 1.5;
             font-size: 0.95rem;
             word-break: break-word;
-            animation: fadeIn 0.2s ease;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            animation: messageSlide 0.2s ease;
         }
-        .message.user {
-            align-self: flex-end;
-            background: #4a6cf7;
-            color: white;
-            border-bottom-right-radius: 8px;
-        }
-        .message.assistant {
-            align-self: flex-start;
-            background: #f1f5f9;
-            color: #0f172a;
-            border-bottom-left-radius: 8px;
-        }
-        .message .role-tag {
-            font-size: 0.7rem;
-            font-weight: 600;
-            opacity: 0.7;
-            margin-bottom: 4px;
-            display: block;
-            letter-spacing: 0.3px;
-        }
-        .message.user .role-tag { color: rgba(255,255,255,0.85); }
-        .message.assistant .role-tag { color: #475569; }
 
-        .chat-input-area {
-            padding: 16px 24px 20px;
-            border-top: 1px solid #e9edf4;
-            background: #ffffff;
-            display: flex;
-            gap: 12px;
-            flex-shrink: 0;
-            flex-wrap: wrap;
+        .chat-messages .message.user {
+            align-self: flex-end;
+            background: #1a5cff;
+            color: white;
+            border-bottom-right-radius: 6px;
         }
+
+        .chat-messages .message.assistant {
+            align-self: flex-start;
+            background: #eef3fa;
+            color: #0b1f3b;
+            border-bottom-left-radius: 6px;
+        }
+
+        .chat-messages .message.assistant .loading-dots::after {
+            content: '...';
+            animation: dots 1.2s steps(3) infinite;
+            display: inline-block;
+            width: 24px;
+            font-weight: bold;
+        }
+
+        @keyframes dots {
+            0% { content: ''; }
+            33% { content: '.'; }
+            66% { content: '..'; }
+            100% { content: '...'; }
+        }
+
+        .chat-messages .message .error-text {
+            color: #c53e3e;
+            background: #ffeeee;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-weight: 500;
+        }
+
+        /* 底部输入区 */
+        .chat-input-area {
+            padding: 14px 20px 20px;
+            background: white;
+            border-top: 1px solid #eef2f6;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-shrink: 0;
+        }
+
         .chat-input-area textarea {
             flex: 1;
-            border: 1px solid #d1d9e6;
+            border: 1px solid #d7dfea;
             border-radius: 30px;
-            padding: 12px 20px;
+            padding: 12px 18px;
             font-size: 0.95rem;
+            font-family: inherit;
             resize: none;
             outline: none;
-            transition: 0.2s;
-            min-height: 52px;
-            background: #f8fafc;
-            font-family: inherit;
-        }
-        .chat-input-area textarea:focus {
-            border-color: #4a6cf7;
-            box-shadow: 0 0 0 3px rgba(74,108,247,0.12);
-            background: white;
-        }
-        .chat-input-area .send-btn {
-            background: #4a6cf7;
-            border: none;
-            color: white;
-            width: 56px;
-            border-radius: 40px;
-            font-size: 1.2rem;
-            cursor: pointer;
+            background: #fafcff;
             transition: 0.15s;
+            max-height: 100px;
+            min-height: 52px;
+            line-height: 1.4;
+        }
+
+        .chat-input-area textarea:focus {
+            border-color: #2d7aff;
+            box-shadow: 0 0 0 3px rgba(45, 122, 255, 0.1);
+        }
+
+        .chat-input-area button {
+            background: #1a5cff;
+            border: none;
+            border-radius: 40px;
+            width: 52px;
+            height: 52px;
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        .chat-input-area .send-btn:hover {
-            background: #3b5de7;
-            transform: scale(0.94);
-        }
-        .chat-input-area .send-btn:disabled {
-            opacity: 0.5;
-            pointer-events: none;
+            color: white;
+            cursor: pointer;
+            transition: 0.15s;
+            flex-shrink: 0;
+            box-shadow: 0 4px 10px -2px rgba(26, 92, 255, 0.3);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0.4; transform: translateY(6px); }
+        .chat-input-area button:hover {
+            background: #0f4ad6;
+            transform: scale(0.96);
+        }
+
+        .chat-input-area button:disabled {
+            opacity: 0.5;
+            pointer-events: none;
+            filter: grayscale(0.4);
+        }
+
+        .chat-input-area button svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2.2;
+        }
+
+        /* 滚动条 */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+        .chat-messages::-webkit-scrollbar-track {
+            background: #f0f4fa;
+        }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 8px;
+        }
+
+        @keyframes messageSlide {
+            from { opacity: 0.4; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #94a3b8;
-            gap: 8px;
-        }
-        .empty-state i {
-            font-size: 3rem;
-            opacity: 0.4;
+        .status-badge {
+            font-size: 0.75rem;
+            color: #53718f;
+            background: #eaf0f8;
+            padding: 4px 12px;
+            border-radius: 30px;
+            margin-left: 8px;
         }
 
-        /* 响应式 */
-        @media (max-width: 820px) {
-            .config-field input { width: 110px; }
-        }
-        @media (max-width: 720px) {
-            .app-container { max-height: 100vh; border-radius: 20px; }
-            .session-sidebar { width: 200px; }
-            .config-field input { width: 100px; }
-            .message { max-width: 90%; }
-        }
-        @media (max-width: 580px) {
-            .app-header { flex-direction: column; align-items: stretch; gap: 8px; }
-            .header-actions { flex-direction: column; align-items: stretch; }
-            .config-group { flex-direction: column; align-items: stretch; }
-            .config-field { width: 100%; }
-            .config-field input { width: 100%; }
-            .main-layout { flex-direction: column; }
-            .session-sidebar {
-                width: 100%;
-                max-height: 180px;
-                border-right: none;
-                border-bottom: 1px solid #e9edf4;
+        /* 移动端适配 */
+        @media (max-width: 600px) {
+            .chat-app {
+                height: 100vh;
+                max-height: 100vh;
+                border-radius: 0;
+                box-shadow: none;
             }
-            .session-list {
-                display: flex;
-                flex-wrap: nowrap;
-                overflow-x: auto;
-                padding: 8px 12px;
-                gap: 8px;
+            .menu-bar h1 {
+                font-size: 1rem;
             }
-            .session-item {
-                flex: 0 0 auto;
-                width: 140px;
-                border: 1px solid #e2e8f0;
-                background: white;
-                padding: 8px 12px;
+            .config-panel.open {
+                max-height: 460px;
             }
-            .session-item .session-name { font-size: 0.8rem; }
-            .add-session-btn { width: auto; margin: 8px 12px; padding: 6px 16px; font-size: 0.8rem; }
-            .session-sidebar-header { padding: 8px 12px; }
-            .chat-messages { padding: 16px; }
-            .chat-input-area { padding: 12px 16px 16px; }
         }
     </style>
 </head>
 <body>
-<div class="app-container">
-    <!-- 头部：可配置 API 地址 / Key / 模型名 -->
-    <header class="app-header">
-        <div class="logo-area">
-            <i class="fas fa-brain"></i>
-            <h1>AI 通用</h1>
-            <span style="font-size:0.8rem; color:#64748b; background:#f1f5f9; padding:2px 12px; border-radius:40px;">多会话</span>
-        </div>
-        <div class="header-actions">
-            <div class="config-group">
-                <div class="config-field">
-                    <i class="fas fa-link"></i>
-                    <input type="text" id="apiBaseInput" placeholder="API 地址" value="https://api.deepseek.com/v1/chat/completions">
-                </div>
-                <div class="config-field">
-                    <i class="fas fa-key"></i>
-                    <input type="password" id="apiKeyInput" placeholder="API Key" value="">
-                    <button id="saveApiKeyBtn"><i class="fas fa-save"></i></button>
-                    <span class="save-status" id="saveStatus"></span>
-                </div>
-                <div class="config-field" style="flex:0 1 140px;">
-                    <i class="fas fa-tag"></i>
-                    <input type="text" id="modelNameInput" placeholder="模型名" value="deepseek-chat">
-                </div>
-            </div>
-            <button class="btn-outline" id="clearCurrentChatBtn"><i class="fas fa-eraser"></i> 清空</button>
-        </div>
-    </header>
 
-    <!-- 主体 -->
-    <div class="main-layout">
-        <aside class="session-sidebar">
-            <div class="session-sidebar-header">
-                <h3><i class="fas fa-comments" style="margin-right:6px;"></i> 会话</h3>
-                <span style="font-size:0.7rem; color:#94a3b8;" id="sessionCount">0</span>
-            </div>
-            <ul class="session-list" id="sessionList"></ul>
-            <button class="add-session-btn" id="addSessionBtn"><i class="fas fa-plus-circle"></i> 新建会话</button>
-        </aside>
+<div class="chat-app" id="app">
+    <!-- 菜单栏 -->
+    <div class="menu-bar">
+        <h1>
+            💬 AI 聊天
+            <span>v1</span>
+        </h1>
+        <button class="menu-toggle-btn" id="menuToggleBtn" aria-label="打开配置菜单">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 6h16M4 12h16M4 18h10" />
+            </svg>
+            配置
+        </button>
+    </div>
 
-        <section class="chat-area">
-            <div class="chat-header">
-                <div class="session-title"><i class="fas fa-message"></i> <span id="currentSessionName">默认会话</span></div>
-                <div>
-                    <button class="btn-danger-outline" id="deleteCurrentSessionBtn" style="margin-right:4px;"><i class="fas fa-trash-can"></i> 删除</button>
-                </div>
-            </div>
-            <div class="chat-messages" id="chatMessages">
-                <div class="empty-state">
-                    <i class="fas fa-comment-dots"></i>
-                    <p>开始对话吧</p>
-                </div>
-            </div>
-            <div class="chat-input-area">
-                <textarea id="userInput" rows="1" placeholder="输入消息… (Enter 发送, Shift+Enter 换行)"></textarea>
-                <button class="send-btn" id="sendBtn"><i class="fas fa-paper-plane"></i></button>
-            </div>
-        </section>
+    <!-- 配置菜单 (可折叠) -->
+    <div class="config-panel" id="configPanel">
+        <div class="config-row">
+            <label>🔗 API 基础地址 <small>(Base URL)</small></label>
+            <input type="url" id="apiBaseInput" placeholder="例如: https://api.openai.com/v1" value="https://api.openai.com/v1">
+        </div>
+        <div class="config-row">
+            <label>📦 模型名称 <small>(Model)</small></label>
+            <input type="text" id="modelInput" placeholder="例如: gpt-3.5-turbo" value="gpt-3.5-turbo">
+        </div>
+        <div class="config-row">
+            <label>🔑 API Key <small>(密钥)</small></label>
+            <input type="password" id="apiKeyInput" placeholder="sk-..." value="">
+        </div>
+        <div class="config-actions">
+            <button id="resetDefaultBtn">重置默认</button>
+            <button class="save-btn" id="saveConfigBtn">保存配置</button>
+        </div>
+    </div>
+
+    <!-- 聊天消息区域 -->
+    <div class="chat-messages" id="chatMessages">
+        <div class="message assistant">
+            👋 你好！我已准备好。请配置 API 并发送消息。
+        </div>
+    </div>
+
+    <!-- 底部输入 -->
+    <div class="chat-input-area">
+        <textarea id="userInput" rows="1" placeholder="输入消息…" aria-label="输入消息"></textarea>
+        <button id="sendBtn" aria-label="发送消息">
+            <svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13" />
+                <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+        </button>
     </div>
 </div>
 
 <script>
     (function() {
-        // ---------- 状态 ----------
-        let sessions = [];
-        let currentSessionId = null;
-        let apiKey = '';
-        let apiBase = 'https://api.deepseek.com/v1/chat/completions';
-        let modelName = 'deepseek-chat';
+        "use strict";
 
-        // DOM
-        const sessionListEl = document.getElementById('sessionList');
-        const chatMessagesEl = document.getElementById('chatMessages');
-        const userInputEl = document.getElementById('userInput');
-        const sendBtn = document.getElementById('sendBtn');
-        const addSessionBtn = document.getElementById('addSessionBtn');
-        const clearCurrentChatBtn = document.getElementById('clearCurrentChatBtn');
-        const deleteCurrentSessionBtn = document.getElementById('deleteCurrentSessionBtn');
-        const currentSessionNameEl = document.getElementById('currentSessionName');
-        const sessionCountEl = document.getElementById('sessionCount');
-        const apiKeyInput = document.getElementById('apiKeyInput');
+        // DOM 元素
+        const menuToggleBtn = document.getElementById('menuToggleBtn');
+        const configPanel = document.getElementById('configPanel');
         const apiBaseInput = document.getElementById('apiBaseInput');
-        const modelNameInput = document.getElementById('modelNameInput');
-        const saveApiKeyBtn = document.getElementById('saveApiKeyBtn');
-        const saveStatus = document.getElementById('saveStatus');
+        const modelInput = document.getElementById('modelInput');
+        const apiKeyInput = document.getElementById('apiKeyInput');
+        const saveConfigBtn = document.getElementById('saveConfigBtn');
+        const resetDefaultBtn = document.getElementById('resetDefaultBtn');
+        const chatMessages = document.getElementById('chatMessages');
+        const userInput = document.getElementById('userInput');
+        const sendBtn = document.getElementById('sendBtn');
 
-        // ---------- 工具 ----------
-        function generateId() {
-            return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
-        }
+        // 状态
+        let isMenuOpen = false;
+        let isProcessing = false;
 
-        function createDefaultSession() {
-            return { id: generateId(), name: '新会话 ' + (sessions.length + 1), messages: [] };
-        }
+        // 默认配置 (示例)
+        const DEFAULT_CONFIG = {
+            baseUrl: 'https://api.openai.com/v1',
+            model: 'gpt-3.5-turbo',
+            apiKey: ''   // 留空，用户自行输入
+        };
 
-        // 存储
-        function saveToStorage() {
+        // ---------- 加载/保存配置 (localStorage) ----------
+        function loadConfigFromStorage() {
             try {
-                const data = {
-                    sessions,
-                    currentSessionId,
-                    apiKey,
-                    apiBase,
-                    modelName
-                };
-                localStorage.setItem('ai_multi_session_universal', JSON.stringify(data));
-            } catch (_) {}
-        }
-
-        function loadFromStorage() {
-            try {
-                const raw = localStorage.getItem('ai_multi_session_universal');
-                if (!raw) return false;
-                const data = JSON.parse(raw);
-                if (data.sessions && Array.isArray(data.sessions) && data.sessions.length > 0) {
-                    sessions = data.sessions;
-                    currentSessionId = data.currentSessionId || sessions[0].id;
-                    apiKey = data.apiKey || '';
-                    apiBase = data.apiBase || 'https://api.deepseek.com/v1/chat/completions';
-                    modelName = data.modelName || 'deepseek-chat';
-                    if (apiKey) apiKeyInput.value = apiKey;
-                    apiBaseInput.value = apiBase;
-                    modelNameInput.value = modelName;
-                    return true;
+                const stored = localStorage.getItem('ai_chat_config');
+                if (stored) {
+                    const parsed = JSON.parse(stored);
+                    apiBaseInput.value = parsed.baseUrl || DEFAULT_CONFIG.baseUrl;
+                    modelInput.value = parsed.model || DEFAULT_CONFIG.model;
+                    apiKeyInput.value = parsed.apiKey || '';
+                    return;
                 }
-            } catch (_) {}
-            return false;
+            } catch (_) { /* ignore */ }
+            // 若没有储存则使用默认
+            apiBaseInput.value = DEFAULT_CONFIG.baseUrl;
+            modelInput.value = DEFAULT_CONFIG.model;
+            apiKeyInput.value = DEFAULT_CONFIG.apiKey;
         }
 
-        function ensureCurrentSession() {
-            if (sessions.length === 0) {
-                const ns = createDefaultSession();
-                sessions.push(ns);
-                currentSessionId = ns.id;
+        function saveConfigToStorage() {
+            const config = {
+                baseUrl: apiBaseInput.value.trim(),
+                model: modelInput.value.trim(),
+                apiKey: apiKeyInput.value.trim()
+            };
+            localStorage.setItem('ai_chat_config', JSON.stringify(config));
+        }
+
+        // 重置为默认 (不清除 apiKey 敏感，保留空)
+        function resetToDefault() {
+            apiBaseInput.value = DEFAULT_CONFIG.baseUrl;
+            modelInput.value = DEFAULT_CONFIG.model;
+            apiKeyInput.value = '';
+            saveConfigToStorage();
+            // 可选: 显示提示
+            showSystemMessage('已重置为默认配置（API Key 已清空）');
+        }
+
+        // 读取当前配置 (返回对象)
+        function getCurrentConfig() {
+            return {
+                baseUrl: apiBaseInput.value.trim(),
+                model: modelInput.value.trim(),
+                apiKey: apiKeyInput.value.trim()
+            };
+        }
+
+        // 验证配置是否完整
+        function isConfigValid(config) {
+            return config.baseUrl.length > 0 && config.model.length > 0 && config.apiKey.length > 0;
+        }
+
+        // ---------- 界面辅助 ----------
+        function showSystemMessage(text, isError = false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message assistant';
+            if (isError) {
+                msgDiv.innerHTML = `<span class="error-text">⚠️ ${text}</span>`;
             } else {
-                const exists = sessions.some(s => s.id === currentSessionId);
-                if (!exists) currentSessionId = sessions[0].id;
+                msgDiv.textContent = text;
+            }
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // 添加一条用户消息
+        function addUserMessage(text) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message user';
+            msgDiv.textContent = text;
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // 添加一条助手消息 (或占位)
+        function addAssistantMessage(text, isError = false) {
+            const msgDiv = document.createElement('div');
+            msgDiv.className = 'message assistant';
+            if (isError) {
+                msgDiv.innerHTML = `<span class="error-text">⚠️ ${text}</span>`;
+            } else {
+                msgDiv.textContent = text;
+            }
+            chatMessages.appendChild(msgDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return msgDiv;
+        }
+
+        // 更新最后一条助手消息 (用于流式/加载)
+        function updateLastAssistantMessage(text, isError = false) {
+            const messages = chatMessages.querySelectorAll('.message.assistant');
+            if (messages.length === 0) {
+                return addAssistantMessage(text, isError);
+            }
+            const last = messages[messages.length - 1];
+            if (isError) {
+                last.innerHTML = `<span class="error-text">⚠️ ${text}</span>`;
+            } else {
+                last.textContent = text;
+            }
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            return last;
+        }
+
+        // 移除最后的 "加载中" 占位 (如果是加载状态)
+        function removeLoadingPlaceholder() {
+            const messages = chatMessages.querySelectorAll('.message.assistant');
+            if (messages.length > 0) {
+                const last = messages[messages.length - 1];
+                // 如果最后一条含有 loading-dots 或 空内容，移除
+                if (last.textContent.trim() === '' || last.textContent.includes('...')) {
+                    last.remove();
+                }
             }
         }
 
-        function getCurrentSession() {
-            return sessions.find(s => s.id === currentSessionId) || null;
-        }
-
-        // ---------- 渲染 ----------
-        function renderSessionList() {
-            sessionListEl.innerHTML = '';
-            sessions.forEach(session => {
-                const li = document.createElement('li');
-                li.className = 'session-item' + (session.id === currentSessionId ? ' active' : '');
-                li.dataset.id = session.id;
-
-                const nameSpan = document.createElement('span');
-                nameSpan.className = 'session-name';
-                nameSpan.textContent = session.name || '未命名';
-                li.appendChild(nameSpan);
-
-                const actionsDiv = document.createElement('div');
-                actionsDiv.className = 'session-actions';
-
-                const renameBtn = document.createElement('button');
-                renameBtn.innerHTML = '<i class="fas fa-pen"></i>';
-                renameBtn.title = '重命名';
-                renameBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const newName = prompt('输入新名称:', session.name);
-                    if (newName && newName.trim() !== '') {
-                        session.name = newName.trim();
-                        renderAll();
-                        saveToStorage();
-                    }
-                });
-                actionsDiv.appendChild(renameBtn);
-
-                const delBtn = document.createElement('button');
-                delBtn.className = 'del-btn';
-                delBtn.innerHTML = '<i class="fas fa-trash-can"></i>';
-                delBtn.title = '删除会话';
-                delBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    if (sessions.length <= 1) {
-                        alert('至少保留一个会话');
-                        return;
-                    }
-                    if (confirm(`删除会话“${session.name}”吗？`)) {
-                        const idx = sessions.findIndex(s => s.id === session.id);
-                        if (idx !== -1) {
-                            sessions.splice(idx, 1);
-                            if (currentSessionId === session.id) currentSessionId = sessions[0].id;
-                            renderAll();
-                            saveToStorage();
-                        }
-                    }
-                });
-                actionsDiv.appendChild(delBtn);
-
-                li.appendChild(actionsDiv);
-                li.addEventListener('click', () => {
-                    if (currentSessionId !== session.id) {
-                        currentSessionId = session.id;
-                        renderAll();
-                        saveToStorage();
-                    }
-                });
-                sessionListEl.appendChild(li);
-            });
-            sessionCountEl.textContent = sessions.length;
-            const cur = getCurrentSession();
-            currentSessionNameEl.textContent = cur ? cur.name : '未选择';
-        }
-
-        function renderMessages() {
-            chatMessagesEl.innerHTML = '';
-            const session = getCurrentSession();
-            if (!session) {
-                chatMessagesEl.innerHTML = `<div class="empty-state"><i class="fas fa-comment-slash"></i><p>请选择会话</p></div>`;
+        // ---------- 核心聊天 (调用 API) ----------
+        async function sendMessageToAI(userText) {
+            if (isProcessing) return;
+            if (!userText.trim()) {
                 return;
             }
-            if (session.messages.length === 0) {
-                chatMessagesEl.innerHTML = `<div class="empty-state"><i class="fas fa-comment-dots"></i><p>开始对话吧</p></div>`;
+
+            const config = getCurrentConfig();
+            if (!isConfigValid(config)) {
+                showSystemMessage('请先完善配置：API 地址、模型名称和 API Key 均不能为空。', true);
                 return;
             }
-            session.messages.forEach(msg => {
-                const div = document.createElement('div');
-                div.className = `message ${msg.role}`;
-                const tag = document.createElement('span');
-                tag.className = 'role-tag';
-                tag.textContent = msg.role === 'user' ? '👤 你' : '🤖 AI';
-                div.appendChild(tag);
-                const content = document.createElement('div');
-                content.textContent = msg.content;
-                div.appendChild(content);
-                chatMessagesEl.appendChild(div);
-            });
-            chatMessagesEl.scrollTop = chatMessagesEl.scrollHeight;
-        }
 
-        function renderAll() {
-            renderSessionList();
-            renderMessages();
-            const session = getCurrentSession();
-            if (!session) {
-                userInputEl.disabled = true;
-                sendBtn.disabled = true;
-            } else {
-                userInputEl.disabled = false;
-                sendBtn.disabled = false;
-            }
-        }
+            // 显示用户消息
+            addUserMessage(userText);
 
-        // ---------- 核心 API 调用 (通用) ----------
-        async function callModel(userMessage) {
-            const session = getCurrentSession();
-            if (!session) return false;
+            // 占位消息 (助手)
+            const loadingMsg = addAssistantMessage('思考中...');
+            // 修改为带动画的占位
+            loadingMsg.innerHTML = `<span class="loading-dots">加载中</span>`;
 
-            // 读取最新配置
-            const baseUrl = apiBaseInput.value.trim() || 'https://api.deepseek.com/v1/chat/completions';
-            const key = apiKeyInput.value.trim();
-            const model = modelNameInput.value.trim() || 'deepseek-chat';
-            if (!key) {
-                alert('请填写 API Key');
-                return false;
-            }
-            // 同步到内存
-            apiKey = key;
-            apiBase = baseUrl;
-            modelName = model;
-            saveToStorage();
-
-            // 添加用户消息
-            session.messages.push({ role: 'user', content: userMessage });
-            renderMessages();
-            saveToStorage();
-
-            const history = session.messages.slice(-12).map(m => ({ role: m.role, content: m.content }));
+            isProcessing = true;
+            sendBtn.disabled = true;
 
             try {
-                const response = await fetch(baseUrl, {
+                // 构建请求
+                const endpoint = config.baseUrl.endsWith('/') ? config.baseUrl : config.baseUrl + '/';
+                const url = endpoint + 'chat/completions';
+
+                const payload = {
+                    model: config.model,
+                    messages: [
+                        { role: 'user', content: userText.trim() }
+                    ],
+                    stream: false,  // 为了简便，非流式，但你可以改为 true 实现流式 (省略)
+                };
+
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${key}`
+                        'Authorization': `Bearer ${config.apiKey}`
                     },
-                    body: JSON.stringify({
-                        model: model,
-                        messages: history,
-                        temperature: 0.7,
-                        max_tokens: 800,
-                        stream: false
-                    })
+                    body: JSON.stringify(payload)
                 });
 
+                // 移除占位
+                loadingMsg.remove();
+
                 if (!response.ok) {
-                    const errText = await response.text();
-                    let errMsg = `API 错误 (${response.status})`;
+                    let errorMsg = `API 错误 (${response.status})`;
                     try {
-                        const errJson = JSON.parse(errText);
-                        errMsg = errJson.error?.message || errMsg;
-                    } catch (_) {}
-                    throw new Error(errMsg);
+                        const errData = await response.json();
+                        if (errData.error && errData.error.message) {
+                            errorMsg = errData.error.message;
+                        } else if (errData.message) {
+                            errorMsg = errData.message;
+                        }
+                    } catch (_) { /* ignore */ }
+                    addAssistantMessage(`请求失败: ${errorMsg}`, true);
+                    return;
                 }
 
                 const data = await response.json();
-                const assistantMessage = data.choices?.[0]?.message?.content;
-                if (!assistantMessage) throw new Error('未收到有效回复');
+                // 提取内容
+                const content = data?.choices?.[0]?.message?.content;
+                if (content) {
+                    addAssistantMessage(content);
+                } else {
+                    addAssistantMessage('未返回有效内容，请检查模型响应格式。', true);
+                }
 
-                session.messages.push({ role: 'assistant', content: assistantMessage });
-                renderMessages();
-                saveToStorage();
-                return true;
             } catch (error) {
-                alert('调用失败: ' + error.message);
-                session.messages.pop();
-                renderMessages();
-                saveToStorage();
-                return false;
+                loadingMsg.remove();
+                let errMsg = error.message || '网络错误或请求超时';
+                if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+                    errMsg = '无法连接到 API，请检查地址或网络。';
+                }
+                addAssistantMessage(`发生错误: ${errMsg}`, true);
+            } finally {
+                isProcessing = false;
+                sendBtn.disabled = false;
+                userInput.focus();
             }
         }
 
-        // ---------- 事件 ----------
-        async function handleSend() {
-            const session = getCurrentSession();
-            if (!session) { alert('请先创建或选择一个会话'); return; }
-            const text = userInputEl.value.trim();
+        // ---------- 事件绑定 ----------
+        // 菜单展开/折叠
+        menuToggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            isMenuOpen = !isMenuOpen;
+            configPanel.classList.toggle('open', isMenuOpen);
+            menuToggleBtn.innerHTML = isMenuOpen
+                ? `<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg> 关闭`
+                : `<svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" style="width:18px;height:18px;"><path d="M4 6h16M4 12h16M4 18h10" /></svg> 配置`;
+        });
+
+        // 保存配置
+        saveConfigBtn.addEventListener('click', function() {
+            const config = getCurrentConfig();
+            // 简单校验
+            if (!config.baseUrl) {
+                alert('请填写 API 基础地址');
+                return;
+            }
+            if (!config.model) {
+                alert('请填写模型名称');
+                return;
+            }
+            if (!config.apiKey) {
+                alert('请填写 API Key');
+                return;
+            }
+            saveConfigToStorage();
+            // 可给出反馈
+            showSystemMessage('✅ 配置已保存 (储存在浏览器)');
+            // 自动关闭菜单 (可选)
+            if (isMenuOpen) {
+                menuToggleBtn.click();
+            }
+        });
+
+        // 重置默认
+        resetDefaultBtn.addEventListener('click', function() {
+            if (confirm('重置配置为默认？API Key 将被清空。')) {
+                resetToDefault();
+                if (isMenuOpen) {
+                    // 不自动关闭，但保留
+                }
+            }
+        });
+
+        // 发送消息 (按钮 + 回车)
+        function handleSend() {
+            const text = userInput.value.trim();
             if (!text) return;
-            userInputEl.value = '';
-            userInputEl.style.height = 'auto';
-            await callModel(text);
+            sendMessageToAI(text);
+            userInput.value = '';
+            // 重置textarea高度
+            userInput.style.height = 'auto';
         }
 
-        function addNewSession() {
-            const ns = createDefaultSession();
-            sessions.push(ns);
-            currentSessionId = ns.id;
-            renderAll();
-            saveToStorage();
-            userInputEl.focus();
-        }
+        sendBtn.addEventListener('click', handleSend);
 
-        function clearCurrentChat() {
-            const session = getCurrentSession();
-            if (!session || session.messages.length === 0) return;
-            if (confirm('清空当前会话的所有消息？')) {
-                session.messages = [];
-                renderMessages();
-                saveToStorage();
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                handleSend();
             }
+        });
+
+        // 自动调整 textarea 高度
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
+
+        // 初始化加载配置
+        loadConfigFromStorage();
+
+        // 若配置有缺省，展示提示（不强制）
+        const cfg = getCurrentConfig();
+        if (!cfg.apiKey) {
+            // 仅提示，不强制
+            setTimeout(() => {
+                // 检测是否已有欢迎消息，避免重复
+                const msgs = chatMessages.querySelectorAll('.message.assistant');
+                if (msgs.length <= 1) {
+                    showSystemMessage('💡 请点击「配置」输入 API Key 和模型信息。');
+                }
+            }, 300);
         }
 
-        function deleteCurrentSession() {
-            if (sessions.length <= 1) { alert('至少保留一个会话'); return; }
-            const session = getCurrentSession();
-            if (!session) return;
-            if (confirm(`删除会话“${session.name}”及其所有消息吗？`)) {
-                const idx = sessions.findIndex(s => s.id === session.id);
-                if (idx !== -1) {
-                    sessions.splice(idx, 1);
-                    currentSessionId = sessions[0].id;
-                    renderAll();
-                    saveToStorage();
+        // 额外：点击其他地方关闭菜单（可选），但不强制
+        document.addEventListener('click', function(e) {
+            const app = document.getElementById('app');
+            if (isMenuOpen && !app.contains(e.target)) {
+                // 点击外部关闭，但这里为了避免干扰，只当点击非菜单区域
+                const panel = document.getElementById('configPanel');
+                const toggle = document.getElementById('menuToggleBtn');
+                if (!panel.contains(e.target) && !toggle.contains(e.target)) {
+                    if (isMenuOpen) {
+                        menuToggleBtn.click();
+                    }
                 }
             }
-        }
+        });
 
-        function saveConfig() {
-            const key = apiKeyInput.value.trim();
-            const base = apiBaseInput.value.trim() || 'https://api.deepseek.com/v1/chat/completions';
-            const model = modelNameInput.value.trim() || 'deepseek-chat';
-            apiKey = key;
-            apiBase = base;
-            modelName = model;
-            saveToStorage();
-            saveStatus.textContent = '✓ 已保存';
-            setTimeout(() => { saveStatus.textContent = ''; }, 2500);
-        }
-
-        // ---------- 初始化 ----------
-        function init() {
-            const loaded = loadFromStorage();
-            if (!loaded) {
-                const defaultSession = createDefaultSession();
-                sessions = [defaultSession];
-                currentSessionId = defaultSession.id;
-                apiKey = '';
-                apiBase = 'https://api.deepseek.com/v1/chat/completions';
-                modelName = 'deepseek-chat';
-                apiBaseInput.value = apiBase;
-                modelNameInput.value = modelName;
-            } else {
-                ensureCurrentSession();
-                apiBaseInput.value = apiBase;
-                modelNameInput.value = modelName;
-                if (apiKey) apiKeyInput.value = apiKey;
-            }
-            renderAll();
-            saveToStorage();
-
-            // 事件绑定
-            sendBtn.addEventListener('click', handleSend);
-            userInputEl.addEventListener('keydown', (e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    handleSend();
-                }
-            });
-            userInputEl.addEventListener('input', () => {
-                userInputEl.style.height = 'auto';
-                userInputEl.style.height = Math.min(userInputEl.scrollHeight, 120) + 'px';
-            });
-            addSessionBtn.addEventListener('click', addNewSession);
-            clearCurrentChatBtn.addEventListener('click', clearCurrentChat);
-            deleteCurrentSessionBtn.addEventListener('click', deleteCurrentSession);
-            saveApiKeyBtn.addEventListener('click', saveConfig);
-            chatMessagesEl.addEventListener('click', () => userInputEl.focus());
-        }
-
-        init();
+        console.log('✨ AI 聊天已启动！');
     })();
 </script>
+
 </body>
 </html>
